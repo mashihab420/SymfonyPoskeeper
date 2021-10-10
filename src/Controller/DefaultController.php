@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Form\UserRegisterFormType;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -43,35 +44,24 @@ class DefaultController extends AbstractController
      */
     public function register(Request $request)
     {
-
-        $form = $this->createFormBuilder()
-            ->add('username')
-            ->add('age')
-            ->add('phone')
-            /*->add('register', SubmitType::class,[
-                'attr'=> [
-                    'class' => 'btn btn-primary float-right'
-                ]
-                ]
-            )*/
-            ->getForm();
+        $user = new User();
+        $form = $this->createForm(UserRegisterFormType::class, $user);
 
         $form->handleRequest($request);
 
-        if ($request->request->all()){
-            dd($request->request->all());
+        if ($form->isSubmitted()){
             $data = $form->getData();
-
-            $user = new User();
-            dd($user);
             $em = $this->getDoctrine()->getManager();
-            $em->persist($user);
+            $em->persist($data);
             $em->flush();
+
+            $this->addFlash('success', 'Registration succesfully!');
+            return $this->redirectToRoute('register');
 
         }
 
         return $this->render('registration/index.html.twig', [
-            'form'=>$form->createView()
+            'form' => $form->createView()
         ]);
     }
 }
