@@ -127,8 +127,7 @@ modules.xml
 !bin/console
 !bin/symfony_requirements
 /vendor/
-.env
-public/.htaccess
+
 
 # Assets and user uploads
 /web/bundles/
