@@ -73,7 +73,7 @@ class ApiController extends AbstractController
     {
         //dd($request);
         //    if ($request->getMethod() == 'GET' && ($request->headers->get('Content-Type') == 'application/json' && $request->headers->get('key') == '8821')) {
-        if ($request->getMethod() == 'GET' && $request->headers->get('Content-Type') == 'application/json' && $request->headers->get('key') == '8821') {
+        if ($request->getMethod() == 'GET' /*&& $request->headers->get('Content-Type') == 'application/json' && $request->headers->get('key') == '8821'*/) {
 
             $records = $apiRepository->getUsers();
 
