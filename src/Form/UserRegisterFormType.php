@@ -24,7 +24,7 @@ class UserRegisterFormType extends AbstractType
             ->add('mobile')
             ->add('address')
             ->add('age')
-            ->add('submit', SubmitType::class)
+          /*  ->add('submit', SubmitType::class)*/
         ;
     }
 

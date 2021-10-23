@@ -2,12 +2,14 @@
 
 namespace App\Controller;
 
+use App\Entity\ComplainDetails;
 use App\Entity\Orders;
 use App\Entity\Product;
 use App\Repository\ApiRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\ProductRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -263,10 +265,17 @@ class ApiController extends AbstractController
         if ($request->getMethod() === 'POST') {
             $data = $request->request->all();
 
+            $items = json_decode($data["items"], true);
+
+            return new JsonResponse($items);
 
             /*foreach ($data as $product){
 
             }*/
+
+            foreach ($items as $key => $item) {
+
+            }
 
             if (isset($data['invoiceno'])){
                 $orders = new Orders();
@@ -303,6 +312,86 @@ class ApiController extends AbstractController
                 'message' => 'failed',
             ]);
         }
+    }
+
+
+    /**
+     * @Route("/search", name="search_product")
+     * @param Request $request
+     * @param ProductRepository $productRepository
+     * @return Response
+     */
+    public function search(Request $request, ProductRepository $productRepository)
+    {
+        if ($request->getMethod() === 'POST') {
+          /*  $data = $request->request->all();*/
+
+          /*  $id = $request->request->get('id');*/
+
+
+            $products = $productRepository->findAll();
+            $data = [];
+            foreach ($products as $key => $product) {
+                $data[$key]['id'] = $product->getId();
+                $data[$key]['name'] = $product->getName();
+            }
+
+            return new JsonResponse($data);
+
+
+
+
+        } else {
+            return new JsonResponse([
+                'status' => 250,
+                'message' => 'failed',
+            ]);
+        }
+    }
+
+    /**
+     * @Route("/uploadsimg", name="uploadsimg")
+     * @param Request $request
+     * @param ParameterBagInterface $parameterBag
+     * @return Response
+     */
+    public function imageupload(Request $request,ParameterBagInterface $parameterBag)
+    {
+        if ($request->getMethod() == 'POST') {
+            $data = $request->request->all();
+
+
+            $em = $this->getDoctrine()->getManager();
+
+
+            $comments = json_decode($data['comments'], true);
+            foreach ($comments as $comment) {
+                $fileName = '';
+                if (preg_match('/^data:image\/(\w+);base64,/', $comment['attachment'], $type)) {
+                    $extension = $type[1];
+                    $attachment = substr($comment['attachment'], strpos($comment['attachment'], ',') + 1);
+                    $attachment = str_replace(' ', '+', $attachment);
+                    $attachment = base64_decode($attachment);
+                    $fileName = $comment['comment'] . '_' . date('d-m-Y') . '_' . time() . '.' . $extension;
+
+                    file_put_contents($parameterBag->get('uploadDir') . '\public\ecommerce\uploads\\' . $fileName, $attachment);
+                }
+
+                $details = new ComplainDetails();
+                $details->setComment($comment['comment']);
+                $details->setUrl($fileName);
+                $em->persist($details);
+                $em->flush();
+
+            }
+
+            return new JsonResponse([
+                'status' => 200,
+                'message' => 'success'
+            ]);
+
+        }
+
     }
 
 }
