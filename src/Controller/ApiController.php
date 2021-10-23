@@ -374,7 +374,7 @@ class ApiController extends AbstractController
                     $attachment = base64_decode($attachment);
                     $fileName = $comment['comment'] . '_' . date('d-m-Y') . '_' . time() . '.' . $extension;
 
-                    file_put_contents($parameterBag->get('uploadDir') . '\public\ecommerce\uploads\\' . $fileName, $attachment);
+                    file_put_contents($parameterBag->get('uploadDir') . '/public/ecommerce/uploads//' . $fileName, $attachment);
                 }
 
                 $details = new ComplainDetails();
